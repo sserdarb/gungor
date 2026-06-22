@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Droplets, Layers, ArrowUpRight, ChevronDown } from "lucide-react";
+import { Droplets, Layers, Sparkles, ArrowUpRight, ChevronDown } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLang } from "@/lib/i18n";
 import { getServiceBySlug } from "@/data/services";
 
-/* ─── Service groups with verified Pexels images ──────────────────────── */
 const px = (id: number) =>
   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1200`;
 
@@ -17,62 +16,68 @@ interface ServiceGroup {
   slugs: string[];
 }
 
+/* ─── Kategori 1: Su Yalıtım Sistemleri (9 hizmet) ─── */
 const waterGroups: ServiceGroup[] = [
   {
     id: "yapi-kabugu",
     titleTr: "Yapı Kabuğu Yalıtımı",
     titleEn: "Building Envelope Waterproofing",
-    image: px(1552617),   // building envelope construction – verified
+    image: px(1552617),
     slugs: ["temel-bohcalama", "perde-doseme-yalitim", "teras-cati-yalitim"],
   },
   {
     id: "ozel-hacimler",
     titleTr: "Özel Hacim Yalıtımı",
     titleEn: "Special Area Waterproofing",
-    image: px(261106),    // pool – verified
+    image: px(261106),
     slugs: ["havuz-tank-yalitim", "islak-hacim-yalitim", "yesil-cati"],
   },
   {
     id: "onarim-detay",
     titleTr: "Onarım & Detay Yalıtımı",
     titleEn: "Repair & Detail Waterproofing",
-    image: px(1267338),   // construction repair work – verified
+    image: px(1267338),
     slugs: ["enjeksiyon", "dilatasyon-yalitim", "negatif-yalitim"],
   },
 ];
 
-const floorGroups: ServiceGroup[] = [
+/* ─── Kategori 2: Endüstriyel Zemin Kaplamaları (6 hizmet) ─── */
+const industrialGroups: ServiceGroup[] = [
   {
     id: "endustriyel-zemin",
-    titleTr: "Endüstriyel Zemin Sistemleri",
-    titleEn: "Industrial Flooring Systems",
-    image: px(2041627),   // industrial flooring – verified
+    titleTr: "Sert Zemin Sistemleri",
+    titleEn: "Hard Floor Systems",
+    image: px(2041627),
     slugs: ["epoksi-zemin", "poliuretan-zemin", "cimento-esasli-zemin", "beton-silim-parlatma"],
-  },
-  {
-    id: "dekoratif-zemin",
-    titleTr: "Dekoratif & Özel Zemin",
-    titleEn: "Decorative & Special Flooring",
-    image: px(1571458),   // interior decorative – verified
-    slugs: ["dekoratif-zemin", "mikro-beton", "hazir-dekoratif-kaplamalar", "self-leveling-sap"],
   },
   {
     id: "otopark-yonlendirme",
     titleTr: "Otopark & Yönlendirme",
     titleEn: "Parking & Road Marking",
-    image: px(1004409),   // parking lot floor – verified
+    image: px(1004409),
     slugs: ["otopark-zemin", "yol-cizgi-yonlendirme"],
-  },
-  {
-    id: "tavan-ozel",
-    titleTr: "Tavan & Özel Kaplama",
-    titleEn: "Ceiling & Special Covering",
-    image: px(1680924),   // interior ceiling/space – verified
-    slugs: ["asma-tavan", "esnek-zemin-pvc-lvt", "karo-hali", "yukseltilmis-doseme"],
   },
 ];
 
-/* ─── GroupCard – styled identical to project cards ─────────────────── */
+/* ─── Kategori 3: Dekoratif Sistemler (10 hizmet) ─── */
+const decorativeGroups: ServiceGroup[] = [
+  {
+    id: "dekoratif-zemin-siva",
+    titleTr: "Dekoratif Zemin & Sıva",
+    titleEn: "Decorative Flooring & Plaster",
+    image: px(1571458),
+    slugs: ["dekoratif-zemin", "mikro-beton", "tas-hali", "dekoratif-siva", "self-leveling-sap"],
+  },
+  {
+    id: "tavan-doseme",
+    titleTr: "Tavan & Özel Döşeme",
+    titleEn: "Ceiling & Special Flooring",
+    image: px(1680924),
+    slugs: ["asma-tavan", "esnek-zemin-pvc-lvt", "karo-hali", "yukseltilmis-doseme", "hazir-dekoratif-kaplamalar"],
+  },
+];
+
+/* ─── GroupCard ─── */
 function GroupCard({
   group,
   index,
@@ -104,7 +109,6 @@ function GroupCard({
         minHeight: "320px",
       }}
     >
-      {/* Background image */}
       <img
         src={group.image}
         alt={title}
@@ -112,7 +116,6 @@ function GroupCard({
         style={{ filter: "brightness(0.55) saturate(0.7)" }}
       />
 
-      {/* Gradient overlay – same as projects */}
       <div
         className="absolute inset-0"
         style={{
@@ -121,7 +124,6 @@ function GroupCard({
         }}
       />
 
-      {/* Gold shimmer on hover */}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-400"
         style={{
@@ -130,15 +132,12 @@ function GroupCard({
         }}
       />
 
-      {/* Active (open) gold top bar */}
       <div
         className="absolute top-0 left-0 right-0 h-[3px] transition-colors duration-300"
         style={{ backgroundColor: isOpen ? "var(--gold-light)" : "transparent" }}
       />
 
-      {/* Card content */}
       <div className="absolute inset-0 p-7 flex flex-col justify-between z-10">
-        {/* Top row: badge + arrow */}
         <div className="flex items-center justify-between">
           <span
             className="inline-block font-urbanist text-[9px] font-bold uppercase tracking-[0.22em] px-3 py-1.5"
@@ -158,7 +157,6 @@ function GroupCard({
           />
         </div>
 
-        {/* Bottom: title */}
         <div>
           <div className="w-5 h-[2px] mb-3" style={{ backgroundColor: "var(--gold-light)" }} />
           <h4 className="font-kalnia font-semibold text-white text-base leading-snug">
@@ -167,7 +165,6 @@ function GroupCard({
         </div>
       </div>
 
-      {/* Number watermark – same as projects */}
       <div
         className="absolute top-4 right-6 font-kalnia font-bold text-7xl opacity-[0.08] leading-none pointer-events-none"
         style={{ color: "var(--gold-light)" }}
@@ -178,7 +175,7 @@ function GroupCard({
   );
 }
 
-/* ─── GroupGrid + inline expand panel ────────────────────────────────── */
+/* ─── CategoryBlock ─── */
 function CategoryBlock({
   groups,
   cols,
@@ -202,7 +199,6 @@ function CategoryBlock({
 
   return (
     <div>
-      {/* Group cards grid – border-based like projects */}
       <div className={`grid ${cols} gap-0 border-l border-t`} style={{ borderColor: "rgba(13,49,67,0.12)" }}>
         {groups.map((group, idx) => (
           <GroupCard
@@ -215,7 +211,6 @@ function CategoryBlock({
         ))}
       </div>
 
-      {/* Expanded service panel – slides in below the grid */}
       <AnimatePresence initial={false}>
         {activeGroup && (
           <motion.div
@@ -265,11 +260,56 @@ function CategoryBlock({
   );
 }
 
-/* ─── Services section ───────────────────────────────────────────────── */
+/* ─── Kategori başlık satırı ─── */
+function CatHeader({
+  icon: Icon,
+  labelKey,
+  countKey,
+  delay = 0,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  labelKey: string;
+  countKey: string;
+  delay?: number;
+}) {
+  const { t } = useLang();
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay }}
+      className="flex items-center gap-4 mb-8"
+    >
+      <div
+        className="w-9 h-9 flex items-center justify-center shrink-0"
+        style={{ backgroundColor: "var(--gold-light)", color: "var(--teal-dark)" }}
+      >
+        <Icon className="w-4 h-4" />
+      </div>
+      <h3
+        className="font-kalnia font-semibold text-xl md:text-2xl"
+        style={{ color: "var(--teal-dark)" }}
+      >
+        {t(labelKey)}
+      </h3>
+      <div className="flex-1 h-px" style={{ backgroundColor: "rgba(13,49,67,0.12)" }} />
+      <span
+        className="font-urbanist text-xs font-bold uppercase tracking-[0.2em]"
+        style={{ color: "var(--gold)" }}
+      >
+        {t(countKey)}
+      </span>
+    </motion.div>
+  );
+}
+
+/* ─── Services section ─── */
 export function Services() {
   const { t } = useLang();
   const [openWaterId, setOpenWaterId] = useState<string | null>(null);
-  const [openFloorId, setOpenFloorId] = useState<string | null>(null);
+  const [openIndustrialId, setOpenIndustrialId] = useState<string | null>(null);
+  const [openDecorativeId, setOpenDecorativeId] = useState<string | null>(null);
 
   return (
     <section
@@ -277,7 +317,6 @@ export function Services() {
       className="py-28 md:py-40 relative overflow-hidden"
       style={{ backgroundColor: "var(--bg-cream)" }}
     >
-      {/* Subtle diagonal texture */}
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.025]"
         style={{
@@ -287,7 +326,7 @@ export function Services() {
       />
 
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 lg:px-20 relative">
-        {/* ── Section header ── */}
+        {/* ── Başlık ── */}
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -319,36 +358,9 @@ export function Services() {
           </p>
         </motion.div>
 
-        {/* ── Su Yalıtımı ── */}
+        {/* ── 1. Su Yalıtım Sistemleri ── */}
         <div className="mb-20 md:mb-24">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center gap-4 mb-8"
-          >
-            <div
-              className="w-9 h-9 flex items-center justify-center shrink-0"
-              style={{ backgroundColor: "var(--gold-light)", color: "var(--teal-dark)" }}
-            >
-              <Droplets className="w-4 h-4" />
-            </div>
-            <h3
-              className="font-kalnia font-semibold text-xl md:text-2xl"
-              style={{ color: "var(--teal-dark)" }}
-            >
-              {t("services.cat1")}
-            </h3>
-            <div className="flex-1 h-px" style={{ backgroundColor: "rgba(13,49,67,0.12)" }} />
-            <span
-              className="font-urbanist text-xs font-bold uppercase tracking-[0.2em]"
-              style={{ color: "var(--gold)" }}
-            >
-              {t("services.cat1Count")}
-            </span>
-          </motion.div>
-
+          <CatHeader icon={Droplets} labelKey="services.cat1" countKey="services.cat1Count" />
           <CategoryBlock
             groups={waterGroups}
             cols="grid-cols-1 md:grid-cols-3"
@@ -357,45 +369,29 @@ export function Services() {
           />
         </div>
 
-        {/* ── Endüstriyel Zemin ── */}
-        <div className="mb-20">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center gap-4 mb-8"
-          >
-            <div
-              className="w-9 h-9 flex items-center justify-center shrink-0"
-              style={{ backgroundColor: "var(--gold-light)", color: "var(--teal-dark)" }}
-            >
-              <Layers className="w-4 h-4" />
-            </div>
-            <h3
-              className="font-kalnia font-semibold text-xl md:text-2xl"
-              style={{ color: "var(--teal-dark)" }}
-            >
-              {t("services.cat2")}
-            </h3>
-            <div className="flex-1 h-px" style={{ backgroundColor: "rgba(13,49,67,0.12)" }} />
-            <span
-              className="font-urbanist text-xs font-bold uppercase tracking-[0.2em]"
-              style={{ color: "var(--gold)" }}
-            >
-              {t("services.cat2Count")}
-            </span>
-          </motion.div>
-
+        {/* ── 2. Endüstriyel Zemin Kaplamaları ── */}
+        <div className="mb-20 md:mb-24">
+          <CatHeader icon={Layers} labelKey="services.cat2" countKey="services.cat2Count" />
           <CategoryBlock
-            groups={floorGroups}
-            cols="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-            openId={openFloorId}
-            setOpenId={setOpenFloorId}
+            groups={industrialGroups}
+            cols="grid-cols-1 md:grid-cols-2"
+            openId={openIndustrialId}
+            setOpenId={setOpenIndustrialId}
           />
         </div>
 
-        {/* ── CTA bar ── */}
+        {/* ── 3. Dekoratif Sistemler ── */}
+        <div className="mb-20">
+          <CatHeader icon={Sparkles} labelKey="services.cat3" countKey="services.cat3Count" />
+          <CategoryBlock
+            groups={decorativeGroups}
+            cols="grid-cols-1 md:grid-cols-2"
+            openId={openDecorativeId}
+            setOpenId={setOpenDecorativeId}
+          />
+        </div>
+
+        {/* ── CTA ── */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -432,8 +428,7 @@ export function Services() {
               (e.currentTarget as HTMLButtonElement).style.color = "#fff";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                "var(--gold-light)";
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--gold-light)";
               (e.currentTarget as HTMLButtonElement).style.color = "var(--teal-dark)";
             }}
           >
