@@ -23,8 +23,8 @@ export function Contact() {
     {
       icon: Mail,
       labelKey: "contact.email",
-      content: "info@gungoryalitim.com",
-      href: "mailto:info@gungoryalitim.com",
+      content: "info@gungormuhendislik.com.tr",
+      href: "mailto:info@gungormuhendislik.com.tr",
     },
   ];
 
