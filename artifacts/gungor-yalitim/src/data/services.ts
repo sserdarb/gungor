@@ -639,6 +639,61 @@ export const services: ServiceItem[] = [
       en: ["Data centers", "Control and command rooms", "Bank back offices", "Hospital intensive care", "TV broadcast studios"],
     },
   },
+
+  /* ═══════════════ DEKORATİF SİSTEMLER (Yeni) ═══════════════ */
+  {
+    slug: "dekoratif-siva",
+    category: "floor",
+    image: px(2104152),
+    title: { tr: "Dekoratif Sıva", en: "Decorative Plaster" },
+    shortDesc: {
+      tr: "İç mekan ve dış cephelerde estetik yüzey dokusu oluşturan mineral, akrilik ve silikon esaslı dekoratif sıva sistemleri.",
+      en: "Mineral, acrylic, and silicone-based decorative plaster systems creating aesthetic surface textures on interior and exterior facades.",
+    },
+    longDesc: {
+      tr: "Dekoratif sıva, iç mekân duvarlarında ve dış cephelerde özgün yüzey dokuları ve renk efektleri elde etmek için uygulanan boya ötesi kaplama sistemidir. Pütürlü, kumlu, perdahlı ve mermer görünümlü farklı varyantlarıyla mekânlara mimari kimlik katar. Dış cephe uygulamalarında su ve UV direnci yüksek malzemeler tercih edilir.",
+      en: "Decorative plaster is a coating system applied on interior walls and exterior facades to achieve unique surface textures and color effects beyond paint. With variants including rough, sandy, polished, and marble-look finishes, it adds architectural identity to spaces. For exterior applications, materials with high water and UV resistance are preferred.",
+    },
+    features: {
+      tr: ["İç mekan & dış cephe uygulaması", "Geniş doku ve renk seçeneği", "UV ve neme dayanımlı formülasyon", "Nefes alabilir yüzey", "Uzun ömürlü estetik"],
+      en: ["Interior & exterior application", "Wide texture and color range", "UV and moisture resistant formulation", "Breathable surface", "Long-lasting aesthetics"],
+    },
+    materials: {
+      tr: ["Mineral esaslı dekoratif sıva", "Akrilik dekoratif kaplama", "Silikon esaslı dış cephe sıvası", "Astar ve boya", "Özel efekt pigmentler"],
+      en: ["Mineral-based decorative plaster", "Acrylic decorative coating", "Silicone-based exterior plaster", "Primer and paint", "Special effect pigments"],
+    },
+    applications: {
+      tr: ["Konut iç duvarları", "Otel lobi ve odaları", "Dış cephe yenileme", "Ticari showroom", "Restoran ve kafe tasarımı"],
+      en: ["Residential interior walls", "Hotel lobbies and rooms", "Exterior facade renovation", "Commercial showrooms", "Restaurant and cafe design"],
+    },
+  },
+
+  {
+    slug: "tas-hali",
+    category: "floor",
+    image: px(1571470),
+    title: { tr: "Taş Halı (Stone Carpet)", en: "Stone Carpet" },
+    shortDesc: {
+      tr: "Doğal taş agregalı, esnek reçine bağlayıcılı, derzsiz ve nefes alabilir taş halı zemin kaplama sistemi.",
+      en: "Seamless and breathable stone carpet flooring system with natural stone aggregate and flexible resin binder.",
+    },
+    longDesc: {
+      tr: "Taş halı; doğal mermer, kuvars veya granit agregalara şeffaf veya renkli poliüretan reçinenin bağlandığı derzsiz, nefes alabilir zemin kaplama sistemidir. Terasa, garaj girişine, havuz kenarına ve yaya alanlarına su geçirgen yapısı sayesinde üstün performans sunar. Doğal estetik ile modern tekniği bir araya getirir.",
+      en: "Stone carpet is a seamless, breathable floor covering system where transparent or colored polyurethane resin binds natural marble, quartz, or granite aggregates. It offers superior performance on terraces, garage entrances, poolside, and pedestrian areas thanks to its water-permeable structure. It combines natural aesthetics with modern technique.",
+    },
+    features: {
+      tr: ["Su geçirgen – birikinti olmaz", "Derzsiz sürekli yüzey", "Kayma direnci yüksek", "Geniş renk ve agrega seçeneği", "Dış mekan UV dayanımı"],
+      en: ["Water-permeable – no puddles", "Seamless continuous surface", "High slip resistance", "Wide color and aggregate selection", "Outdoor UV resistance"],
+    },
+    materials: {
+      tr: ["Doğal mermer/kuvars agrega", "Şeffaf PU reçine bağlayıcı", "Epoksi astar", "Sealer (koruyucu son kat)", "Kenar profilleri"],
+      en: ["Natural marble/quartz aggregate", "Transparent PU resin binder", "Epoxy primer", "Sealer (protective topcoat)", "Edge profiles"],
+    },
+    applications: {
+      tr: ["Teras ve balkonlar", "Havuz kenarı", "Garaj ve araç giriş yolları", "Alışveriş merkezi dışı", "Yaya yürüyüş alanları"],
+      en: ["Terraces and balconies", "Poolside", "Garage and vehicle entrances", "Shopping center exteriors", "Pedestrian walkways"],
+    },
+  },
 ];
 
 export const waterServices = services.filter((s) => s.category === "water");
