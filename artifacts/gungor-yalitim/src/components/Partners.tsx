@@ -27,6 +27,30 @@ const partners = [
     href: "https://www.lunik.cc/tr/inicio-turkce/",
     name_display: "LUNIK",
   },
+  {
+    name: "DEMMERG",
+    tagline: { tr: "Su Yalıtım Sistemleri", en: "Waterproofing Systems" },
+    description: { tr: "Bitümlü membran, sıvı su yalıtımı ve yapı kimyasalları alanında geniş ürün yelpazesiyle güvenilir tedarik ortağımız.", en: "Our reliable supply partner with a wide product range in bituminous membranes, liquid waterproofing, and construction chemicals." },
+    logoUrl: "https://logo.clearbit.com/demmerg.com",
+    href: "https://demmerg.com/",
+    name_display: "DEMMERG",
+  },
+  {
+    name: "KÖSTER",
+    tagline: { tr: "Alman Mühendislik & Yalıtım", en: "German Engineering & Waterproofing" },
+    description: { tr: "Köster, su yalıtımı ve yapı koruma sistemlerinde 30 yılı aşkın Alman mühendislik kalitesini Türkiye'ye taşıyan uluslararası marka.", en: "Köster is an international brand bringing over 30 years of German engineering quality in waterproofing and building protection systems to Turkey." },
+    logoUrl: "https://logo.clearbit.com/koster.com.tr",
+    href: "https://koster.com.tr/",
+    name_display: "KÖSTER",
+  },
+  {
+    name: "BAUMIT",
+    tagline: { tr: "Cephe & Sıva Sistemleri", en: "Facade & Plaster Systems" },
+    description: { tr: "Avrupa'nın önde gelen yapı malzemeleri markası Baumit; sıva, cephe, ısı yalıtımı ve zemin sistemlerinde eksiksiz çözümler sunar.", en: "Baumit, Europe's leading building materials brand, offers complete solutions in plaster, facade, thermal insulation, and flooring systems." },
+    logoUrl: "https://logo.clearbit.com/baumit.com.tr",
+    href: "https://baumit.com.tr/",
+    name_display: "BAUMIT",
+  },
 ];
 
 export function Partners() {
@@ -62,7 +86,7 @@ export function Partners() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-l border-t" style={{ borderColor: "rgba(232,200,149,0.15)" }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t" style={{ borderColor: "rgba(232,200,149,0.15)" }}>
           {partners.map((partner, idx) => (
             <motion.a
               key={idx}
