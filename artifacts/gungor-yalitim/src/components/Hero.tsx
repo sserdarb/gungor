@@ -5,7 +5,7 @@ import { useLang } from "@/lib/i18n";
 const stats = [
   { valueKey: "18+", labelKey: "hero.stat1" },
   { valueKey: "2024", labelKey: "hero.stat2" },
-  { valueKey: "23",   labelKey: "hero.stat3" },
+  { valueKey: "25",   labelKey: "hero.stat3" },
   { valueKey: "%100", labelKey: "hero.stat4" },
 ];
 
