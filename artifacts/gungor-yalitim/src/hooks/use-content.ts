@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { services as staticServices } from "@/data/services";
-import { projects as staticProjects } from "@/data/projects";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { services as staticServices, ServiceItem } from "@/data/services";
+import { projects as staticProjects, Project } from "@/data/projects";
 
-export function useServices() {
+export function useServices(): UseQueryResult<ServiceItem[], Error> {
   return useQuery({
     queryKey: ["/api/services"],
     queryFn: async () => {
@@ -30,7 +30,7 @@ export function useServices() {
   });
 }
 
-export function useProjects() {
+export function useProjects(): UseQueryResult<Project[], Error> {
   return useQuery({
     queryKey: ["/api/projects"],
     queryFn: async () => {

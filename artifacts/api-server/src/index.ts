@@ -10,8 +10,8 @@ import { db, usersTable, servicesTable, projectsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 
 // Import existing static data for seeding if database is empty
-import { services as staticServices } from "../../gungor-yalitim/src/data/services.ts";
-import { projects as staticProjects } from "../../gungor-yalitim/src/data/projects.ts";
+import { services as staticServices } from "./data/services";
+import { projects as staticProjects } from "./data/projects";
 
 const JWT_SECRET = process.env.JWT_SECRET || "gungor-secret-key-2026";
 const PORT = process.env.PORT || 5000;
@@ -135,18 +135,21 @@ function requireAuth(req: any, res: any, next: any) {
 app.post("/api/auth/login", async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    return res.status(400).json({ message: "Username and password required" });
+    res.status(400).json({ message: "Username and password required" });
+    return;
   }
 
   try {
     const user = await db.select().from(usersTable).where(eq(usersTable.username, username)).get();
     if (!user) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      res.status(401).json({ message: "Invalid username or password" });
+      return;
     }
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      res.status(401).json({ message: "Invalid username or password" });
+      return;
     }
 
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: "7d" });
@@ -158,9 +161,11 @@ app.post("/api/auth/login", async (req, res) => {
     });
 
     res.json({ user: { id: user.id, username: user.username } });
+    return;
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error during login" });
+    return;
   }
 });
 
@@ -336,10 +341,12 @@ app.delete("/api/projects/:id", requireAuth, async (req, res) => {
 // --- Media Upload Route ---
 app.post("/api/upload", requireAuth, upload.single("file"), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
+    res.status(400).json({ message: "No file uploaded" });
+    return;
   }
   const fileUrl = `/uploads/${req.file.filename}`;
   res.json({ url: fileUrl });
+  return;
 });
 
 // Serve frontend in production

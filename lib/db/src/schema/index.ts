@@ -1,5 +1,4 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const usersTable = sqliteTable("users", {
@@ -49,9 +48,47 @@ export const projectsTable = sqliteTable("projects", {
 });
 
 // Zod schemas for validation
-export const insertUserSchema = createInsertSchema(usersTable).omit({ id: true, createdAt: true });
-export const insertServiceSchema = createInsertSchema(servicesTable).omit({ id: true });
-export const insertProjectSchema = createInsertSchema(projectsTable).omit({ id: true });
+export const insertUserSchema = z.object({
+  username: z.string().min(1),
+  password: z.string().min(1),
+});
+
+export const insertServiceSchema = z.object({
+  slug: z.string().min(1),
+  category: z.string().min(1),
+  image: z.string().min(1),
+  titleTr: z.string().min(1),
+  titleEn: z.string().min(1),
+  descriptionTr: z.string().min(1),
+  descriptionEn: z.string().min(1),
+  contentTr: z.string().min(1),
+  contentEn: z.string().min(1),
+  featuresTr: z.string().min(1),
+  featuresEn: z.string().min(1),
+  materialsTr: z.string().min(1),
+  materialsEn: z.string().min(1),
+  applicationsTr: z.string().min(1),
+  applicationsEn: z.string().min(1),
+  order: z.number().optional(),
+});
+
+export const insertProjectSchema = z.object({
+  slug: z.string().min(1),
+  category: z.string().min(1),
+  year: z.number(),
+  location: z.string().min(1),
+  image: z.string().min(1),
+  gallery: z.string().min(1),
+  titleTr: z.string().min(1),
+  titleEn: z.string().min(1),
+  clientTypeTr: z.string().min(1),
+  clientTypeEn: z.string().min(1),
+  scopeTr: z.string().min(1),
+  scopeEn: z.string().min(1),
+  descriptionTr: z.string().min(1),
+  descriptionEn: z.string().min(1),
+  details: z.string().min(1),
+});
 
 export type User = typeof usersTable.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;

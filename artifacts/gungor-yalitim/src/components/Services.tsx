@@ -4,6 +4,7 @@ import { Droplets, Layers, Sparkles, ArrowUpRight, ChevronDown } from "lucide-re
 import { useLocation } from "wouter";
 import { useLang } from "@/lib/i18n";
 import { useServices } from "@/hooks/use-content";
+import { ServiceItem } from "@/data/services";
 
 const px = (id: number) =>
   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1200`;
@@ -95,7 +96,7 @@ function GroupCard({
   const title = lang === "tr" ? group.titleTr : group.titleEn;
   const services = group.slugs
     .map((slug) => getServiceBySlug(slug))
-    .filter(Boolean);
+    .filter((s): s is ServiceItem => !!s);
 
   return (
     <motion.div
@@ -198,7 +199,7 @@ function CategoryBlock({
   const activeServices = activeGroup
     ? activeGroup.slugs
         .map((s) => getServiceBySlug(s))
-        .filter(Boolean)
+        .filter((s): s is ServiceItem => !!s)
     : [];
 
   return (

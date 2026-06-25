@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+*.tsbuildinfo
+lib/db/data/sqlite.db
+lib/db/data/sqlite.db-journal
+lib/db/data/sqlite.db-shm
+lib/db/data/sqlite.db-wal
+uploads/
+/data/

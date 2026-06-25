@@ -53,7 +53,7 @@ const solutionData = [
   },
 ];
 
-const cardVariants = {
+const cardVariants: any = {
   hidden: { opacity: 0, y: 32 },
   visible: (i: number) => ({
     opacity: 1,
