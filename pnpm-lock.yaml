@@ -133,6 +133,9 @@ importers:
       '@types/multer':
         specifier: ^1.4.12
         version: 1.4.13
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.9.4
       tsx:
         specifier: 'catalog:'
         version: 4.22.4

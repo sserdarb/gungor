@@ -25,6 +25,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/cookie-parser": "^1.4.8",
+    "@types/node": "catalog:",
     "tsx": "catalog:",
     "typescript": "~5.9.2"
   }
