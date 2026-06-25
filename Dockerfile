@@ -3,13 +3,16 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Install build dependencies for native modules
+RUN apk add --no-cache python3 make g++
+
 RUN npm install -g pnpm
 
 # Copy workspace configuration files
 COPY package.json pnpm-workspace.yaml ./
 COPY pnpm-lock.yaml ./
 
-# Copy all project packages
+# Copy all project packages (package.json only for install cache)
 COPY artifacts/gungor-yalitim/package.json ./artifacts/gungor-yalitim/
 COPY artifacts/api-server/package.json ./artifacts/api-server/
 COPY lib/db/package.json ./lib/db/
@@ -18,8 +21,8 @@ COPY lib/api-spec/package.json ./lib/api-spec/
 COPY lib/api-zod/package.json ./lib/api-zod/
 COPY scripts/package.json ./scripts/
 
-# Install dependencies (including devDependencies for build/typecheck)
-RUN pnpm install --ignore-scripts
+# Install all dependencies (allow scripts for native modules)
+RUN pnpm install
 
 # Copy the rest of the application code
 COPY . .
@@ -29,7 +32,7 @@ ENV PORT=5000
 ENV BASE_PATH=/
 ENV NODE_ENV=production
 
-# Build packages (Builds db, then builds React frontend assets into artifacts/gungor-yalitim/dist)
+# Build packages (db typecheck, then React frontend, then API server)
 RUN pnpm run build
 
 # Stage 2: Runtime image
@@ -42,7 +45,7 @@ RUN npm install -g pnpm
 # Copy workspace configuration
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 
-# Copy built code and configuration
+# Copy built code and configuration from builder
 COPY --from=builder /app/artifacts/api-server ./artifacts/api-server
 COPY --from=builder /app/artifacts/gungor-yalitim ./artifacts/gungor-yalitim
 COPY --from=builder /app/lib/db ./lib/db
@@ -51,7 +54,7 @@ COPY --from=builder /app/lib/api-spec ./lib/api-spec
 COPY --from=builder /app/lib/api-zod ./lib/api-zod
 COPY --from=builder /app/scripts ./scripts
 
-# Install production and build dependencies in runner so drizzle-kit can be run at startup
+# Install dependencies including devDependencies (drizzle-kit needed for push at startup)
 RUN pnpm install --ignore-scripts
 
 # Create data and uploads directories for persistence

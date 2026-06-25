@@ -32,6 +32,11 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use("/uploads", express.static(uploadsDir));
 
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 // Multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
