@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { ArrowUpRight } from "lucide-react";
-import { projects } from "@/data/projects";
+import { useProjects } from "@/hooks/use-content";
 import { useLang } from "@/lib/i18n";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -15,6 +15,7 @@ export default function Projects() {
   const [filter, setFilter] = useState<Filter>("all");
   const [, navigate] = useLocation();
   const { lang, t } = useLang();
+  const { data: projects = [] } = useProjects();
 
   const filtered = projects.filter((p) => filter === "all" || p.category === filter);
 

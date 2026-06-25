@@ -1,7 +1,7 @@
 import { useParams, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
-import { projects } from "@/data/projects";
+import { useProjects } from "@/hooks/use-content";
 import { useLang } from "@/lib/i18n";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -11,6 +11,7 @@ export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();
   const [, navigate] = useLocation();
   const { lang, t } = useLang();
+  const { data: projects = [] } = useProjects();
 
   const project = projects.find((p) => p.slug === slug);
   const related = projects.filter((p) => p.slug !== slug && p.category === project?.category).slice(0, 3);

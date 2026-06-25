@@ -1,7 +1,7 @@
 import { useParams, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, Package, MapPin } from "lucide-react";
-import { getServiceBySlug, services } from "@/data/services";
+import { useServices } from "@/hooks/use-content";
 import { useLang } from "@/lib/i18n";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -11,7 +11,9 @@ export default function ServiceDetail() {
   const { slug } = useParams<{ slug: string }>();
   const [, navigate] = useLocation();
   const { lang, t } = useLang();
+  const { data: services = [] } = useServices();
 
+  const getServiceBySlug = (slugStr: string) => services.find((s: any) => s.slug === slugStr);
   const service = getServiceBySlug(slug ?? "");
 
   if (!service) {

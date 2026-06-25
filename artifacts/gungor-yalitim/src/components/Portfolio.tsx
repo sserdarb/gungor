@@ -2,11 +2,12 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLang } from "@/lib/i18n";
-import { projects } from "@/data/projects";
+import { useProjects } from "@/hooks/use-content";
 
 export function Portfolio() {
   const [, navigate] = useLocation();
   const { lang, t } = useLang();
+  const { data: projects = [] } = useProjects();
 
   const featured = projects.slice(0, 6);
 

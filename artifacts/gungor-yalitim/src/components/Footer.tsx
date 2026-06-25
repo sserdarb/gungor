@@ -1,15 +1,19 @@
 import { useLocation } from "wouter";
 import { useLang } from "@/lib/i18n";
-import { waterServices, floorServices } from "@/data/services";
+import { useServices } from "@/hooks/use-content";
 
 export function Footer() {
   const [, navigate] = useLocation();
   const { lang, t } = useLang();
+  const { data: services = [] } = useServices();
 
   const scrollTo = (href: string) => {
     const el = document.querySelector(href);
     if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72, behavior: "smooth" });
   };
+
+  const waterServices = services.filter((s: any) => s.category === "water");
+  const floorServices = services.filter((s: any) => s.category === "floor");
 
   const featuredWater = waterServices.slice(0, 4);
   const featuredFloor = floorServices.slice(0, 4);

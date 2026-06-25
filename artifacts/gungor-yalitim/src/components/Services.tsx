@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Droplets, Layers, Sparkles, ArrowUpRight, ChevronDown } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLang } from "@/lib/i18n";
-import { getServiceBySlug } from "@/data/services";
+import { useServices } from "@/hooks/use-content";
 
 const px = (id: number) =>
   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1200`;
@@ -90,10 +90,12 @@ function GroupCard({
   onToggle: () => void;
 }) {
   const { lang } = useLang();
+  const { data: servicesData = [] } = useServices();
+  const getServiceBySlug = (slug: string) => servicesData.find((s: any) => s.slug === slug);
   const title = lang === "tr" ? group.titleTr : group.titleEn;
   const services = group.slugs
     .map((slug) => getServiceBySlug(slug))
-    .filter(Boolean) as NonNullable<ReturnType<typeof getServiceBySlug>>[];
+    .filter(Boolean);
 
   return (
     <motion.div
@@ -189,12 +191,14 @@ function CategoryBlock({
 }) {
   const [, navigate] = useLocation();
   const { lang } = useLang();
+  const { data: servicesData = [] } = useServices();
+  const getServiceBySlug = (slug: string) => servicesData.find((s: any) => s.slug === slug);
 
   const activeGroup = openId ? groups.find((g) => g.id === openId) : null;
   const activeServices = activeGroup
     ? activeGroup.slugs
         .map((s) => getServiceBySlug(s))
-        .filter(Boolean) as NonNullable<ReturnType<typeof getServiceBySlug>>[]
+        .filter(Boolean)
     : [];
 
   return (
