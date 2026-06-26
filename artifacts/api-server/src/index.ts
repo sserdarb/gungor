@@ -358,11 +358,11 @@ app.post("/api/upload", requireAuth, upload.single("file"), (req, res) => {
 const frontendBuildDir = path.resolve(process.cwd(), "../gungor-yalitim/dist/public");
 if (fs.existsSync(frontendBuildDir)) {
   app.use(express.static(frontendBuildDir));
-  app.get("*", (req, res) => {
+  app.get("*any", (req, res) => {
     res.sendFile(path.join(frontendBuildDir, "index.html"));
   });
 } else {
-  app.get("*", (req, res) => {
+  app.get("*any", (req, res) => {
     res.json({ message: "API server is running. Frontend build not found." });
   });
 }
