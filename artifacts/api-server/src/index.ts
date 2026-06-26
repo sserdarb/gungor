@@ -8,7 +8,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
-import { db, usersTable, servicesTable, projectsTable, settingsTable, menuItemsTable, translationsTable } from "@workspace/db";
+import { db, usersTable, servicesTable, projectsTable, settingsTable, menuItemsTable, translationsTable, chatSessionsTable, chatMessagesTable, leadsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 
 // Import existing static data for seeding if database is empty
@@ -620,6 +620,280 @@ app.post("/api/upload", requireAuth, upload.single("file"), (req, res) => {
   const fileUrl = `/uploads/${req.file.filename}`;
   res.json({ url: fileUrl });
   return;
+});
+
+// --- Chatbot & Leads Routes ---
+
+// Public Chat endpoint
+app.post("/api/chat", async (req, res) => {
+  const { sessionId, message, lang } = req.body;
+  if (!sessionId || !message) {
+    res.status(400).json({ message: "sessionId and message required" });
+    return;
+  }
+
+  try {
+    const activeLang = lang === "en" ? "en" : "tr";
+    // Check or create session
+    let session = await db.select().from(chatSessionsTable).where(eq(chatSessionsTable.sessionId, sessionId)).get();
+    if (!session) {
+      session = await db.insert(chatSessionsTable).values({ sessionId, lang: activeLang }).returning().get();
+    }
+
+    // Insert user message
+    await db.insert(chatMessagesTable).values({ sessionId, role: "user", content: message });
+
+    // Fetch context data
+    const services = await db.select().from(servicesTable).all();
+    const projects = await db.select().from(projectsTable).all();
+    const settings = await db.select().from(settingsTable).limit(1).get();
+
+    // System prompt formulation
+    const formattedDate = new Date().toLocaleDateString(activeLang === "en" ? "en-US" : "tr-TR", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    const systemPrompt = `You are the smart AI assistant of Güngör Yalıtım (Güngör Mühendislik) Waterproofing & Industrial Flooring.
+Your task is to answer visitors' questions about the company, services, and reference projects in a professional, polite, helpful and corporate manner.
+
+Current Date and Time: ${formattedDate}.
+
+RULES:
+1. Answer strictly based on the company details below. If a service/project is not listed, recommend contacting the firm directly.
+2. Be friendly and conversational for general queries (hello, how are you, etc.) but direct the user back to asking about our waterproofing & floor coating solutions.
+3. Automatically adapt to the user's language. Speak Turkish if the user speaks Turkish, English if they speak English.
+4. If the user wants a quote (teklif), a free site survey (ücretsiz keşif), wants pricing, or wants to be contacted, politely ask for their:
+   - Name and Surname (Ad Soyad)
+   - Phone Number (Telefon)
+   - Email (optional)
+   - Project description or requested service
+5. Once you have gathered these details (Name and Phone are mandatory), append this exact JSON tag at the VERY END of your response (hidden from user view):
+   [LEAD_CAPTURE: {"name": "Client Name", "phone": "Phone Number", "email": "Email Address", "service": "Requested Service", "message": "Brief summary of request"}]
+   - Keep this format exactly. Use valid double-quoted JSON strings. The backend parses this to store leads.
+
+COMPANY DETAILS:
+- Address: ${settings?.contactAddressTr || "İzmir, Türkiye"}
+- Address (EN): ${settings?.contactAddressEn || "Izmir, Turkey"}
+- Phone: ${settings?.contactPhone || "+90 554 561 64 83"}
+- Email: ${settings?.contactEmail || "info@gungormuhendislik.com.tr"}
+- WhatsApp: https://wa.me/${settings?.whatsappNumber || "905541624638"}
+
+OUR SERVICES:
+${services.map(s => `- ${activeLang === "tr" ? s.titleTr : s.titleEn}: ${activeLang === "tr" ? s.descriptionTr : s.descriptionEn}. Detail: ${activeLang === "tr" ? s.contentTr : s.contentEn}`).join("\n")}
+
+OUR COMPLETED PROJECTS (REFERENCES):
+${projects.map(p => `- ${activeLang === "tr" ? p.titleTr : p.titleEn} (Year: ${p.year}, Location: ${p.location}): ${activeLang === "tr" ? p.descriptionTr : p.descriptionEn}`).join("\n")}
+`;
+
+    // Fetch message history
+    const history = await db.select().from(chatMessagesTable).where(eq(chatMessagesTable.sessionId, sessionId)).all();
+    history.sort((a, b) => a.id - b.id);
+    const chatHistory = history.map(m => ({ role: m.role, content: m.content }));
+
+    const MISTRAL_API_KEY = "nv0Dk63HfliVexgD9On8OSbyIn2d7TRS";
+
+    let aiMessage = "";
+    // Try mistral-small-latest first, fallback to open-mixtral-8x7b if it fails
+    const models = ["mistral-small-latest", "open-mixtral-8x7b"];
+    let apiSuccess = false;
+
+    for (const model of models) {
+      if (apiSuccess) break;
+      try {
+        const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${MISTRAL_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              ...chatHistory
+            ],
+            temperature: 0.7
+          })
+        });
+
+        if (response.ok) {
+          const resData = (await response.json()) as any;
+          aiMessage = resData.choices?.[0]?.message?.content || "";
+          if (aiMessage) {
+            apiSuccess = true;
+            break;
+          }
+        }
+      } catch (err) {
+        console.error(`Mistral API Error with model ${model}:`, err);
+      }
+    }
+
+    if (!apiSuccess) {
+      aiMessage = activeLang === "en" 
+        ? "We are currently experiencing a high volume of requests. Please call or WhatsApp us directly at the numbers provided on the contact page."
+        : "Şu anda yoğunluk sebebiyle yanıt veremiyorum. Lütfen iletişim sayfamızdaki telefon numaralarından veya WhatsApp hattımızdan bizimle doğrudan iletişime geçin.";
+    }
+
+    // Lead detection in response
+    const leadRegex = /\[LEAD_CAPTURE:\s*(\{.*?\})\s*\]/;
+    const match = aiMessage.match(leadRegex);
+    let cleanedContent = aiMessage;
+
+    if (match) {
+      try {
+        const leadData = JSON.parse(match[1]);
+        await db.insert(leadsTable).values({
+          sessionId,
+          source: "chatbot",
+          type: "quote",
+          name: leadData.name || "Bilinmeyen",
+          phone: leadData.phone || "Belirtilmedi",
+          email: leadData.email || "",
+          service: leadData.service || "",
+          message: leadData.message || "Chatbot lead capture"
+        });
+        // Strip out lead capture tags
+        cleanedContent = aiMessage.replace(leadRegex, "").trim();
+      } catch (err) {
+        console.error("Failed to parse captured lead JSON:", err);
+      }
+    }
+
+    // Save assistant response
+    await db.insert(chatMessagesTable).values({ sessionId, role: "assistant", content: cleanedContent });
+
+    res.json({ response: cleanedContent });
+    return;
+  } catch (err: any) {
+    console.error("Chat error:", err);
+    res.status(500).json({ message: "Error communicating with chatbot assistant" });
+    return;
+  }
+});
+
+// Public Lead form submission
+app.post("/api/leads", async (req, res) => {
+  const { type, name, phone, email, service, message } = req.body;
+  if (!name || !phone || !message) {
+    res.status(400).json({ message: "Name, phone, and message are required" });
+    return;
+  }
+
+  try {
+    const newLead = await db.insert(leadsTable).values({
+      source: "form",
+      type: type || "contact",
+      name,
+      phone,
+      email: email || "",
+      service: service || "",
+      message,
+      status: "new"
+    }).returning().get();
+    res.status(201).json(newLead);
+    return;
+  } catch (err: any) {
+    console.error("Error creating lead from form:", err);
+    res.status(500).json({ message: "Error saving contact request" });
+    return;
+  }
+});
+
+// --- Admin Panel API Endpoints (Auth Required) ---
+
+// Get all chat sessions with stats
+app.get("/api/admin/chat-sessions", requireAuth, async (req, res) => {
+  try {
+    const sessions = await db.select().from(chatSessionsTable).all();
+    const result = [];
+    for (const s of sessions) {
+      const msgs = await db.select().from(chatMessagesTable).where(eq(chatMessagesTable.sessionId, s.sessionId)).all();
+      msgs.sort((a, b) => a.id - b.id);
+      result.push({
+        id: s.id,
+        sessionId: s.sessionId,
+        lang: s.lang,
+        createdAt: s.createdAt,
+        messageCount: msgs.length,
+        lastMessage: msgs[msgs.length - 1]?.content || ""
+      });
+    }
+    // Sort descending by date
+    result.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching chat sessions" });
+  }
+});
+
+// Get message history of a chat session
+app.get("/api/admin/chat-sessions/:sessionId/messages", requireAuth, async (req, res) => {
+  const { sessionId } = req.params;
+  try {
+    const msgs = await db.select().from(chatMessagesTable).where(eq(chatMessagesTable.sessionId, sessionId)).all();
+    msgs.sort((a, b) => a.id - b.id);
+    res.json(msgs);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching chat messages" });
+  }
+});
+
+// Delete a chat session and its history
+app.delete("/api/admin/chat-sessions/:sessionId", requireAuth, async (req, res) => {
+  const { sessionId } = req.params;
+  try {
+    await db.delete(chatMessagesTable).where(eq(chatMessagesTable.sessionId, sessionId));
+    await db.delete(chatSessionsTable).where(eq(chatSessionsTable.sessionId, sessionId));
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting chat session" });
+  }
+});
+
+// Get all leads
+app.get("/api/admin/leads", requireAuth, async (req, res) => {
+  try {
+    const leads = await db.select().from(leadsTable).all();
+    // Sort descending by date
+    leads.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    res.json(leads);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching leads" });
+  }
+});
+
+// Update a lead status
+app.put("/api/admin/leads/:id", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!status) {
+    res.status(400).json({ message: "Status required" });
+    return;
+  }
+
+  try {
+    await db.update(leadsTable).set({ status }).where(eq(leadsTable.id, Number(id)));
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Error updating lead status" });
+  }
+});
+
+// Delete a lead
+app.delete("/api/admin/leads/:id", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.delete(leadsTable).where(eq(leadsTable.id, Number(id)));
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting lead" });
+  }
 });
 
 // Serve frontend in production

@@ -84,6 +84,35 @@ export const translationsTable = sqliteTable("translations", {
   en: text("en").notNull(),
 });
 
+export const chatSessionsTable = sqliteTable("chat_sessions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  sessionId: text("session_id").notNull().unique(),
+  lang: text("lang").notNull(),
+  createdAt: integer("created_at").$defaultFn(() => Date.now()),
+});
+
+export const chatMessagesTable = sqliteTable("chat_messages", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  sessionId: text("session_id").notNull(),
+  role: text("role").notNull(), // 'user' | 'assistant'
+  content: text("content").notNull(),
+  createdAt: integer("created_at").$defaultFn(() => Date.now()),
+});
+
+export const leadsTable = sqliteTable("leads", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  sessionId: text("session_id"),
+  source: text("source").notNull(), // 'chatbot' | 'form'
+  type: text("type").notNull(), // 'quote' | 'contact'
+  name: text("name").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email").notNull(),
+  service: text("service"),
+  message: text("message").notNull(),
+  status: text("status").default("new"), // 'new' | 'contacted' | 'completed'
+  createdAt: integer("created_at").$defaultFn(() => Date.now()),
+});
+
 // Zod schemas for validation
 export const insertUserSchema = z.object({
   username: z.string().min(1),
@@ -161,6 +190,29 @@ export const insertTranslationSchema = z.object({
   en: z.string().min(1),
 });
 
+export const insertChatSessionSchema = z.object({
+  sessionId: z.string().min(1),
+  lang: z.string().min(1),
+});
+
+export const insertChatMessageSchema = z.object({
+  sessionId: z.string().min(1),
+  role: z.string().min(1),
+  content: z.string().min(1),
+});
+
+export const insertLeadSchema = z.object({
+  sessionId: z.string().nullable().optional(),
+  source: z.string().min(1),
+  type: z.string().min(1),
+  name: z.string().min(1),
+  phone: z.string().min(1),
+  email: z.string().min(1),
+  service: z.string().nullable().optional(),
+  message: z.string().min(1),
+  status: z.string().optional(),
+});
+
 export type User = typeof usersTable.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
@@ -178,3 +230,12 @@ export type InsertMenuItem = z.infer<typeof insertMenuItemSchema>;
 
 export type Translation = typeof translationsTable.$inferSelect;
 export type InsertTranslation = z.infer<typeof insertTranslationSchema>;
+
+export type ChatSession = typeof chatSessionsTable.$inferSelect;
+export type InsertChatSession = z.infer<typeof insertChatSessionSchema>;
+
+export type ChatMessage = typeof chatMessagesTable.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+
+export type Lead = typeof leadsTable.$inferSelect;
+export type InsertLead = z.infer<typeof insertLeadSchema>;

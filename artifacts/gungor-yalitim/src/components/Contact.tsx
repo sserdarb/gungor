@@ -3,9 +3,66 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export function Contact() {
   const { lang, t } = useLang();
+  const { toast } = useToast();
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [service, setService] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !phone.trim() || !message.trim()) {
+      toast({
+        title: lang === "tr" ? "Hata" : "Error",
+        description: lang === "tr" ? "Lütfen tüm zorunlu alanları doldurun." : "Please fill out all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "contact",
+          name,
+          phone,
+          email: "",
+          service,
+          message
+        })
+      });
+
+      if (!res.ok) throw new Error("API error");
+
+      toast({
+        title: lang === "tr" ? "Başarılı" : "Success",
+        description: lang === "tr" ? "Mesajınız başarıyla iletildi. En kısa sürede sizinle iletişime geçeceğiz." : "Your message has been sent successfully. We will get back to you shortly.",
+      });
+
+      setName("");
+      setPhone("");
+      setService("");
+      setMessage("");
+    } catch (err) {
+      toast({
+        title: lang === "tr" ? "Sistem Hatası" : "System Error",
+        description: lang === "tr" ? "Mesajınız gönderilemedi. Lütfen daha sonra tekrar deneyin." : "Your message could not be sent. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const contactItems = [
     {
@@ -103,7 +160,7 @@ export function Contact() {
                 {lang === "tr" ? "Mesaj Gönderin" : "Send a Message"}
               </h3>
 
-              <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   {[
                     { id: "name",  labelKey: "contact.name",  placeholder: lang === "tr" ? "Adınız Soyadınız" : "Full Name", type: "text",  testId: "input-name" },
@@ -118,6 +175,8 @@ export function Contact() {
                         type={field.type}
                         data-testid={field.testId}
                         placeholder={field.placeholder}
+                        value={field.id === "name" ? name : phone}
+                        onChange={(e) => field.id === "name" ? setName(e.target.value) : setPhone(e.target.value)}
                         className="h-12 font-urbanist text-white placeholder:text-white/25 rounded-none border-0 border-b focus-visible:ring-0 focus-visible:border-[#E8C895]"
                         style={{ backgroundColor: "transparent", borderBottom: "1px solid rgba(255,255,255,0.15)" }}
                       />
@@ -132,6 +191,8 @@ export function Contact() {
                   <select
                     id="service"
                     data-testid="select-service"
+                    value={service}
+                    onChange={(e) => setService(e.target.value)}
                     className="w-full h-12 font-urbanist text-sm text-white/70 focus:outline-none pb-2"
                     style={{ backgroundColor: "transparent", borderBottom: "1px solid rgba(255,255,255,0.15)" }}
                   >
@@ -150,6 +211,8 @@ export function Contact() {
                   <Textarea
                     id="message"
                     data-testid="input-message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
                     placeholder={lang === "tr" ? "Projeniz hakkında kısaca bilgi verebilirsiniz..." : "Tell us briefly about your project..."}
                     className="min-h-[120px] font-urbanist text-white placeholder:text-white/25 rounded-none border-0 border-b focus-visible:ring-0 resize-none"
                     style={{ backgroundColor: "transparent", borderBottom: "1px solid rgba(255,255,255,0.15)" }}
@@ -158,14 +221,15 @@ export function Contact() {
 
                 <button
                   type="submit"
+                  disabled={submitting}
                   data-testid="button-form-submit"
-                  className="w-full h-14 flex items-center justify-center gap-3 font-urbanist font-bold text-sm uppercase tracking-[0.2em] transition-all duration-300"
+                  className="w-full h-14 flex items-center justify-center gap-3 font-urbanist font-bold text-sm uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50"
                   style={{ backgroundColor: "var(--gold-light)", color: "var(--teal-dark)" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--gold)"; (e.currentTarget as HTMLButtonElement).style.color = "#fff"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--gold-light)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--teal-dark)"; }}
+                  onMouseEnter={(e) => { if (!submitting) { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--gold)"; (e.currentTarget as HTMLButtonElement).style.color = "#fff"; } }}
+                  onMouseLeave={(e) => { if (!submitting) { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--gold-light)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--teal-dark)"; } }}
                 >
                   <Send className="w-4 h-4" />
-                  {t("contact.send")}
+                  {submitting ? (lang === "tr" ? "GÖNDERİLİYOR..." : "SENDING...") : t("contact.send")}
                 </button>
               </form>
             </div>

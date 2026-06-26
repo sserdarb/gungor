@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, useLocation, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +17,9 @@ import AdminSettings from "@/pages/admin/settings";
 import AdminMenus from "@/pages/admin/menus";
 import AdminUsers from "@/pages/admin/users";
 import AdminContents from "@/pages/admin/contents";
+import AdminChats from "@/pages/admin/chats";
+import AdminLeads from "@/pages/admin/leads";
+import { Chatbot } from "@/components/Chatbot";
 
 const queryClient = new QueryClient();
 
@@ -120,6 +123,9 @@ function Router() {
   const { lang } = useLang();
   const [settings, setSettings] = useState<any>(null);
 
+  const [location] = useLocation();
+  const isAdmin = location.startsWith("/admin");
+
   useEffect(() => {
     fetch("/api/settings")
       .then((res) => {
@@ -147,21 +153,26 @@ function Router() {
   }, [lang, settings]);
 
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/hizmetler/:slug" component={ServiceDetail} />
-      <Route path="/projeler" component={Projects} />
-      <Route path="/projeler/:slug" component={ProjectDetail} />
-      <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/services" component={ServicesManagement} />
-      <Route path="/admin/projects" component={ProjectsManagement} />
-      <Route path="/admin/settings" component={AdminSettings} />
-      <Route path="/admin/menus" component={AdminMenus} />
-      <Route path="/admin/users" component={AdminUsers} />
-      <Route path="/admin/contents" component={AdminContents} />
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/hizmetler/:slug" component={ServiceDetail} />
+        <Route path="/projeler" component={Projects} />
+        <Route path="/projeler/:slug" component={ProjectDetail} />
+        <Route path="/admin/login" component={AdminLogin} />
+        <Route path="/admin" component={AdminDashboard} />
+        <Route path="/admin/services" component={ServicesManagement} />
+        <Route path="/admin/projects" component={ProjectsManagement} />
+        <Route path="/admin/settings" component={AdminSettings} />
+        <Route path="/admin/menus" component={AdminMenus} />
+        <Route path="/admin/users" component={AdminUsers} />
+        <Route path="/admin/contents" component={AdminContents} />
+        <Route path="/admin/chats" component={AdminChats} />
+        <Route path="/admin/leads" component={AdminLeads} />
+        <Route component={NotFound} />
+      </Switch>
+      {!isAdmin && <Chatbot />}
+    </>
   );
 }
 
