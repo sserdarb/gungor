@@ -6,17 +6,36 @@ import path from "path";
 import fs from "fs";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { db, usersTable, servicesTable, projectsTable } from "@workspace/db";
+import helmet from "helmet";
+import { rateLimit } from "express-rate-limit";
+import { db, usersTable, servicesTable, projectsTable, settingsTable, menuItemsTable, translationsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 
 // Import existing static data for seeding if database is empty
 import { services as staticServices } from "./data/services";
 import { projects as staticProjects } from "./data/projects";
+import { defaultTranslations } from "./data/translations";
 
 const JWT_SECRET = process.env.JWT_SECRET || "gungor-secret-key-2026";
 const PORT = process.env.PORT || 5000;
 
 const app = express();
+
+// Apply security headers
+app.use(helmet({
+  contentSecurityPolicy: false, // Bypass CSP to allow embedding third-party analytics scripts easily
+}));
+
+// Apply Rate Limiting to prevent brute-force attacks and DDoS
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300, // Limit each IP to 300 requests per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.ip === '127.0.0.1' || req.ip === '::1' || req.path === '/api/health',
+  message: { message: "Too many requests from this IP, please try again after 15 minutes" }
+});
+app.use("/api", limiter);
 
 app.use(cors({
   origin: true,
@@ -115,6 +134,61 @@ async function seedDatabase() {
         });
       }
       console.log(`Successfully seeded ${staticProjects.length} projects.`);
+    }
+
+    // 4. Seed Settings
+    const settings = await db.select().from(settingsTable).limit(1);
+    if (settings.length === 0) {
+      console.log("Seeding default settings database...");
+      await db.insert(settingsTable).values({
+        titleTr: "Güngör Yalıtım Uygulama Çözümleri | İzmir Su Yalıtımı ve Zemin Kaplama",
+        titleEn: "Gungor Waterproofing & Industrial Flooring Systems | Izmir",
+        descriptionTr: "İzmir merkezli Güngör Yalıtım Uygulama Çözümleri; 18+ yıllık tecrübeyle su yalıtımı, endüstriyel zemin kaplama ve asma tavan sistemlerinde anahtar teslim, garantili profesyonel çözümler sunar.",
+        descriptionEn: "Izmir-based Gungor Waterproofing; turnkey, guaranteed professional solutions in waterproofing and industrial flooring with 18+ years exp.",
+        keywordsTr: "su yalıtımı, epoksi zemin kaplama, poliüretan zemin, izolasyon, izmir yalıtım, güngör yalıtım",
+        keywordsEn: "waterproofing, epoxy flooring, polyurethane flooring, insulation, izmir waterproofing, gungor",
+        whatsappNumber: "905541624638",
+        contactEmail: "info@gungormuhendislik.com.tr",
+        contactPhone: "+90 232 123 45 67",
+        contactAddressTr: "İzmir, Türkiye",
+        contactAddressEn: "Izmir, Turkey",
+        socialFacebook: "https://facebook.com/gungoryalitim",
+        socialInstagram: "https://instagram.com/gungoryalitim",
+        socialLinkedin: "https://linkedin.com/company/gungoryalitim"
+      });
+      console.log("Default settings created successfully.");
+    }
+
+    // 5. Seed Menu Items
+    const menus = await db.select().from(menuItemsTable).limit(1);
+    if (menus.length === 0) {
+      console.log("Seeding default menus database...");
+      const defaultMenus = [
+        { labelTr: "Ana Sayfa", labelEn: "Home", link: "/", order: 1 },
+        { labelTr: "Hizmetler", labelEn: "Services", link: "/#hizmetler", order: 2 },
+        { labelTr: "Çözüm Alanları", labelEn: "Solutions", link: "/#cozumler", order: 3 },
+        { labelTr: "Neden Biz?", labelEn: "Why Us?", link: "/#neden-biz", order: 4 },
+        { labelTr: "Projelerimiz", labelEn: "Projects", link: "/projeler", order: 5 },
+        { labelTr: "İletişim", labelEn: "Contact", link: "/#iletisim", order: 6 },
+      ];
+      for (const menu of defaultMenus) {
+        await db.insert(menuItemsTable).values(menu);
+      }
+      console.log("Default menus created successfully.");
+    }
+
+    // 6. Seed Translations
+    const existingTranslations = await db.select().from(translationsTable).limit(1);
+    if (existingTranslations.length === 0) {
+      console.log("Seeding default translations database...");
+      for (const [key, val] of Object.entries(defaultTranslations)) {
+        await db.insert(translationsTable).values({
+          key,
+          tr: val.tr,
+          en: val.en
+        });
+      }
+      console.log("Successfully seeded translation keys.");
     }
   } catch (err) {
     console.error("Database seeding error:", err);
@@ -340,6 +414,200 @@ app.delete("/api/projects/:id", requireAuth, async (req, res) => {
     res.json({ success: true });
   } catch (err: any) {
     res.status(500).json({ message: err.message || "Error deleting project" });
+  }
+});
+
+// --- Settings Routes ---
+app.get("/api/settings", async (req, res) => {
+  try {
+    const settings = await db.select().from(settingsTable).limit(1).get();
+    res.json(settings || {});
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching settings" });
+  }
+});
+
+app.put("/api/settings", requireAuth, async (req, res) => {
+  try {
+    const {
+      titleTr, titleEn, descriptionTr, descriptionEn, keywordsTr, keywordsEn,
+      googleAnalyticsId, googleSearchConsoleId, googleTagManagerId, facebookPixelId,
+      whatsappNumber, contactEmail, contactPhone, contactAddressTr, contactAddressEn,
+      socialFacebook, socialInstagram, socialLinkedin
+    } = req.body;
+
+    const existing = await db.select().from(settingsTable).limit(1).get();
+    if (existing) {
+      await db.update(settingsTable)
+        .set({
+          titleTr, titleEn, descriptionTr, descriptionEn, keywordsTr, keywordsEn,
+          googleAnalyticsId, googleSearchConsoleId, googleTagManagerId, facebookPixelId,
+          whatsappNumber, contactEmail, contactPhone, contactAddressTr, contactAddressEn,
+          socialFacebook, socialInstagram, socialLinkedin
+        })
+        .where(eq(settingsTable.id, existing.id));
+    } else {
+      await db.insert(settingsTable).values({
+        titleTr, titleEn, descriptionTr, descriptionEn, keywordsTr, keywordsEn,
+        googleAnalyticsId, googleSearchConsoleId, googleTagManagerId, facebookPixelId,
+        whatsappNumber, contactEmail, contactPhone, contactAddressTr, contactAddressEn,
+        socialFacebook, socialInstagram, socialLinkedin
+      });
+    }
+
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message || "Error updating settings" });
+  }
+});
+
+// --- Menu Items Routes ---
+app.get("/api/menu-items", async (req, res) => {
+  try {
+    const menus = await db.select().from(menuItemsTable).all();
+    menus.sort((a, b) => (a.order || 0) - (b.order || 0));
+    res.json(menus);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching menu items" });
+  }
+});
+
+app.post("/api/menu-items", requireAuth, async (req, res) => {
+  try {
+    const { labelTr, labelEn, link, order } = req.body;
+    const newItem = await db.insert(menuItemsTable).values({
+      labelTr, labelEn, link, order: Number(order) || 0
+    }).returning().get();
+    res.status(201).json(newItem);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message || "Error creating menu item" });
+  }
+});
+
+app.put("/api/menu-items/:id", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { labelTr, labelEn, link, order } = req.body;
+    await db.update(menuItemsTable)
+      .set({ labelTr, labelEn, link, order: Number(order) || 0 })
+      .where(eq(menuItemsTable.id, Number(id)));
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message || "Error updating menu item" });
+  }
+});
+
+app.delete("/api/menu-items/:id", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.delete(menuItemsTable).where(eq(menuItemsTable.id, Number(id)));
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message || "Error deleting menu item" });
+  }
+});
+
+// --- Translations Routes ---
+app.get("/api/translations", async (req, res) => {
+  try {
+    const trans = await db.select().from(translationsTable).all();
+    res.json(trans);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching translations" });
+  }
+});
+
+app.put("/api/translations", requireAuth, async (req, res) => {
+  try {
+    const { key, tr, en } = req.body;
+    if (!key) {
+      res.status(400).json({ message: "Key is required" });
+      return;
+    }
+    const existing = await db.select().from(translationsTable).where(eq(translationsTable.key, key)).get();
+    if (existing) {
+      await db.update(translationsTable)
+        .set({ tr, en })
+        .where(eq(translationsTable.key, key));
+    } else {
+      await db.insert(translationsTable).values({ key, tr, en });
+    }
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message || "Error updating translation" });
+  }
+});
+
+// --- Users Management Routes ---
+app.get("/api/users", requireAuth, async (req, res) => {
+  try {
+    const users = await db.select().from(usersTable).all();
+    const sanitizedUsers = users.map(u => ({ id: u.id, username: u.username, createdAt: u.createdAt }));
+    res.json(sanitizedUsers);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching users" });
+  }
+});
+
+app.post("/api/users", requireAuth, async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      res.status(400).json({ message: "Username and password required" });
+      return;
+    }
+    const existing = await db.select().from(usersTable).where(eq(usersTable.username, username)).get();
+    if (existing) {
+      res.status(400).json({ message: "Username already exists" });
+      return;
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await db.insert(usersTable).values({
+      username, password: hashedPassword
+    }).returning().get();
+    res.status(201).json({ id: newUser.id, username: newUser.username });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message || "Error creating user" });
+  }
+});
+
+app.put("/api/users/:id", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { username, password } = req.body;
+    const updateData: any = {};
+    if (username) {
+      const existing = await db.select().from(usersTable).where(eq(usersTable.username, username)).get();
+      if (existing && existing.id !== Number(id)) {
+        res.status(400).json({ message: "Username already exists" });
+        return;
+      }
+      updateData.username = username;
+    }
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      await db.update(usersTable).set(updateData).where(eq(usersTable.id, Number(id)));
+    }
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message || "Error updating user" });
+  }
+});
+
+app.delete("/api/users/:id", requireAuth, async (req: any, res) => {
+  const { id } = req.params;
+  try {
+    if (req.user && req.user.id === Number(id)) {
+      res.status(400).json({ message: "You cannot delete your own account" });
+      return;
+    }
+    await db.delete(usersTable).where(eq(usersTable.id, Number(id)));
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message || "Error deleting user" });
   }
 });
 

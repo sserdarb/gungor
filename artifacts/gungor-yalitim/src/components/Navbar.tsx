@@ -23,29 +23,73 @@ export function Navbar() {
     return () => { document.body.style.overflow = ""; };
   }, [isMobileMenuOpen]);
 
-  /* scroll-to or navigate-then-scroll */
-  const scrollTo = (e: React.MouseEvent, href: string) => {
+  const [menuItems, setMenuItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/menu-items")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch menu items");
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setMenuItems(data);
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading menu items, using defaults:", err);
+      });
+  }, []);
+
+  const handleLinkClick = (e: React.MouseEvent, href: string) => {
     e.preventDefault();
     setIsMobileMenuOpen(false);
-    if (!isHome) {
-      navigate("/");
-      setTimeout(() => {
-        const el = document.querySelector(href);
-        if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72, behavior: "smooth" });
-      }, 350);
+
+    if (href.startsWith("http://") || href.startsWith("https://")) {
+      window.open(href, "_blank", "noopener,noreferrer");
       return;
     }
-    const el = document.querySelector(href);
-    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72, behavior: "smooth" });
+
+    if (href.startsWith("/#") || href.startsWith("#")) {
+      const hash = href.includes("#") ? href.split("#")[1] : "";
+      const selector = `#${hash}`;
+      if (!isHome) {
+        navigate("/");
+        setTimeout(() => {
+          const el = document.querySelector(selector);
+          if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72, behavior: "smooth" });
+        }, 350);
+        return;
+      }
+      const el = document.querySelector(selector);
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72, behavior: "smooth" });
+      return;
+    }
+
+    if (href === "/") {
+      if (!isHome) {
+        navigate("/");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    navigate(href);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const navLinks = [
-    { name: t("nav.services"),   href: "#hizmetler" },
-    { name: t("nav.solutions"),  href: "#cozumler" },
-    { name: t("nav.whyus"),      href: "#neden-biz" },
-    { name: t("nav.projects"),   href: "#projeler", isProjectsLink: true },
-    { name: t("nav.contact"),    href: "#iletisim" },
-  ];
+  const navLinks = menuItems.length > 0
+    ? menuItems.map((item) => ({
+        name: lang === "tr" ? item.labelTr : item.labelEn,
+        href: item.link,
+      }))
+    : [
+        { name: t("nav.services"),   href: "#hizmetler" },
+        { name: t("nav.solutions"),  href: "#cozumler" },
+        { name: t("nav.whyus"),      href: "#neden-biz" },
+        { name: t("nav.projects"),   href: "/projeler" },
+        { name: t("nav.contact"),    href: "#iletisim" },
+      ];
 
   const showDark = isScrolled || !isHome;
 
@@ -81,27 +125,15 @@ export function Navbar() {
           <ul className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <li key={link.name}>
-                {link.isProjectsLink ? (
-                  <a
-                    href="/projeler"
-                    onClick={(e) => { e.preventDefault(); navigate("/projeler"); }}
-                    className={`font-urbanist text-sm font-semibold tracking-wider uppercase transition-colors duration-300 ${
-                      showDark ? "text-[#545454] hover:text-[#A58E6A]" : "text-white/80 hover:text-[#E8C895]"
-                    }`}
-                  >
-                    {link.name}
-                  </a>
-                ) : (
-                  <a
-                    href={link.href}
-                    onClick={(e) => scrollTo(e, link.href)}
-                    className={`font-urbanist text-sm font-semibold tracking-wider uppercase transition-colors duration-300 ${
-                      showDark ? "text-[#545454] hover:text-[#A58E6A]" : "text-white/80 hover:text-[#E8C895]"
-                    }`}
-                  >
-                    {link.name}
-                  </a>
-                )}
+                <a
+                  href={link.href}
+                  onClick={(e) => handleLinkClick(e, link.href)}
+                  className={`font-urbanist text-sm font-semibold tracking-wider uppercase transition-colors duration-300 ${
+                    showDark ? "text-[#545454] hover:text-[#A58E6A]" : "text-white/80 hover:text-[#E8C895]"
+                  }`}
+                >
+                  {link.name}
+                </a>
               </li>
             ))}
           </ul>
@@ -122,7 +154,7 @@ export function Navbar() {
 
             <a
               href="#iletisim"
-              onClick={(e) => scrollTo(e, "#iletisim")}
+              onClick={(e) => handleLinkClick(e, "#iletisim")}
               data-testid="button-nav-teklif"
               className={`inline-flex items-center gap-2 px-6 py-2.5 font-urbanist text-sm font-bold uppercase tracking-widest border transition-all duration-300 ${
                 showDark
@@ -167,11 +199,8 @@ export function Navbar() {
               {navLinks.map((link, i) => (
                 <motion.a
                   key={link.name}
-                  href={link.isProjectsLink ? "/projeler" : link.href}
-                  onClick={(e) => {
-                    if (link.isProjectsLink) { e.preventDefault(); navigate("/projeler"); setIsMobileMenuOpen(false); }
-                    else scrollTo(e, link.href);
-                  }}
+                  href={link.href}
+                  onClick={(e) => handleLinkClick(e, link.href)}
                   initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.07 + 0.1 }}
@@ -191,7 +220,7 @@ export function Navbar() {
               </motion.button>
               <motion.a
                 href="#iletisim"
-                onClick={(e) => scrollTo(e, "#iletisim")}
+                onClick={(e) => handleLinkClick(e, "#iletisim")}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}

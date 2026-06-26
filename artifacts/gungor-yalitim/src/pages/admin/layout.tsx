@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { LayoutDashboard, FileText, Briefcase, LogOut, Home, Menu, X, Globe } from "lucide-react";
+import { LayoutDashboard, FileText, Briefcase, LogOut, Home, Menu, X, Globe, Settings, ListCollapse, Users, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminLayoutProps {
@@ -56,6 +56,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin", label: "Kontrol Paneli", icon: LayoutDashboard },
     { href: "/admin/services", label: "Hizmetler Yönetimi", icon: FileText },
     { href: "/admin/projects", label: "Projeler Yönetimi", icon: Briefcase },
+    { href: "/admin/contents", label: "İçerik Yönetimi", icon: Languages },
+    { href: "/admin/menus", label: "Menü Yönetimi", icon: ListCollapse },
+    { href: "/admin/users", label: "Yöneticiler", icon: Users },
+    { href: "/admin/settings", label: "Sistem & SEO Ayarları", icon: Settings },
   ];
 
   return (

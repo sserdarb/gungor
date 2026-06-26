@@ -1,14 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-
-export type Lang = "tr" | "en";
-
-interface LangContextValue {
-  lang: Lang;
-  toggle: () => void;
-  t: (key: string) => string;
-}
-
-const translations: Record<string, Record<Lang, string>> = {
+export const defaultTranslations: Record<string, { tr: string; en: string }> = {
   /* ── Navbar ── */
   "nav.services":      { tr: "Hizmetler",       en: "Services" },
   "nav.solutions":     { tr: "Çözüm Alanları",  en: "Solutions" },
@@ -131,62 +121,3 @@ const translations: Record<string, Record<Lang, string>> = {
   "general.contact":   { tr: "İletişime Geç", en: "Contact Us" },
   "general.home":      { tr: "Ana Sayfa", en: "Home" },
 };
-
-const LangContext = createContext<LangContextValue>({
-  lang: "tr",
-  toggle: () => {},
-  t: (key) => key,
-});
-
-export function LangProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>(() => {
-    const saved = localStorage.getItem("gungor_lang");
-    return (saved === "tr" || saved === "en") ? saved : "tr";
-  });
-  const [dynamicTrans, setDynamicTrans] = useState<Record<string, Record<Lang, string>>>({});
-
-  useEffect(() => {
-    localStorage.setItem("gungor_lang", lang);
-  }, [lang]);
-
-  useEffect(() => {
-    fetch("/api/translations")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch translations");
-        return res.json();
-      })
-      .then((data: Array<{ key: string; tr: string; en: string }>) => {
-        const mapped: Record<string, Record<Lang, string>> = {};
-        data.forEach((item) => {
-          mapped[item.key] = { tr: item.tr, en: item.en };
-        });
-        setDynamicTrans(mapped);
-      })
-      .catch((err) => {
-        console.error("Error loading translations, using fallbacks:", err);
-      });
-  }, []);
-
-  const toggle = () => setLang((l) => (l === "tr" ? "en" : "tr"));
-
-  const t = (key: string): string => {
-    // Try dynamic DB translations first
-    if (dynamicTrans[key]) {
-      return dynamicTrans[key][lang] ?? key;
-    }
-    // Fallback to static local translations
-    const entry = translations[key];
-    if (!entry) return key;
-    return entry[lang] ?? key;
-  };
-
-  return (
-    <LangContext.Provider value={{ lang, toggle, t }}>
-      {children}
-    </LangContext.Provider>
-  );
-}
-
-export function useLang() {
-  return useContext(LangContext);
-}

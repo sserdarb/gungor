@@ -47,6 +47,43 @@ export const projectsTable = sqliteTable("projects", {
   details: text("details").notNull(), // stored as JSON string (Array<{label: {tr, en}, value: {tr, en}}>)
 });
 
+export const settingsTable = sqliteTable("settings", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  titleTr: text("title_tr").notNull(),
+  titleEn: text("title_en").notNull(),
+  descriptionTr: text("description_tr").notNull(),
+  descriptionEn: text("description_en").notNull(),
+  keywordsTr: text("keywords_tr").notNull(),
+  keywordsEn: text("keywords_en").notNull(),
+  googleAnalyticsId: text("google_analytics_id"),
+  googleSearchConsoleId: text("google_search_console_id"),
+  googleTagManagerId: text("google_tag_manager_id"),
+  facebookPixelId: text("facebook_pixel_id"),
+  whatsappNumber: text("whatsapp_number").notNull(),
+  contactEmail: text("contact_email").notNull(),
+  contactPhone: text("contact_phone").notNull(),
+  contactAddressTr: text("contact_address_tr").notNull(),
+  contactAddressEn: text("contact_address_en").notNull(),
+  socialFacebook: text("social_facebook"),
+  socialInstagram: text("social_instagram"),
+  socialLinkedin: text("social_linkedin"),
+});
+
+export const menuItemsTable = sqliteTable("menu_items", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  labelTr: text("label_tr").notNull(),
+  labelEn: text("label_en").notNull(),
+  link: text("link").notNull(),
+  order: integer("order").default(0),
+});
+
+export const translationsTable = sqliteTable("translations", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  key: text("key").notNull().unique(),
+  tr: text("tr").notNull(),
+  en: text("en").notNull(),
+});
+
 // Zod schemas for validation
 export const insertUserSchema = z.object({
   username: z.string().min(1),
@@ -90,6 +127,40 @@ export const insertProjectSchema = z.object({
   details: z.string().min(1),
 });
 
+export const insertSettingsSchema = z.object({
+  titleTr: z.string().min(1),
+  titleEn: z.string().min(1),
+  descriptionTr: z.string().min(1),
+  descriptionEn: z.string().min(1),
+  keywordsTr: z.string().min(1),
+  keywordsEn: z.string().min(1),
+  googleAnalyticsId: z.string().nullable().optional(),
+  googleSearchConsoleId: z.string().nullable().optional(),
+  googleTagManagerId: z.string().nullable().optional(),
+  facebookPixelId: z.string().nullable().optional(),
+  whatsappNumber: z.string().min(1),
+  contactEmail: z.string().min(1),
+  contactPhone: z.string().min(1),
+  contactAddressTr: z.string().min(1),
+  contactAddressEn: z.string().min(1),
+  socialFacebook: z.string().nullable().optional(),
+  socialInstagram: z.string().nullable().optional(),
+  socialLinkedin: z.string().nullable().optional(),
+});
+
+export const insertMenuItemSchema = z.object({
+  labelTr: z.string().min(1),
+  labelEn: z.string().min(1),
+  link: z.string().min(1),
+  order: z.number().optional(),
+});
+
+export const insertTranslationSchema = z.object({
+  key: z.string().min(1),
+  tr: z.string().min(1),
+  en: z.string().min(1),
+});
+
 export type User = typeof usersTable.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
@@ -98,3 +169,12 @@ export type InsertService = z.infer<typeof insertServiceSchema>;
 
 export type Project = typeof projectsTable.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
+
+export type Settings = typeof settingsTable.$inferSelect;
+export type InsertSettings = z.infer<typeof insertSettingsSchema>;
+
+export type MenuItem = typeof menuItemsTable.$inferSelect;
+export type InsertMenuItem = z.infer<typeof insertMenuItemSchema>;
+
+export type Translation = typeof translationsTable.$inferSelect;
+export type InsertTranslation = z.infer<typeof insertTranslationSchema>;
