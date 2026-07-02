@@ -19,10 +19,10 @@ const translations: Record<string, Record<Lang, string>> = {
 
   /* ── Hero ── */
   "hero.badge":        { tr: "18+ Yıllık Sektör Deneyimi", en: "18+ Years of Industry Experience" },
-  "hero.line1":        { tr: "Yapıların",        en: "Protecting" },
-  "hero.line2":        { tr: "Geleceğini",       en: "the Future" },
-  "hero.line3":        { tr: "Koruyoruz.",       en: "of Structures." },
-  "hero.sub":          { tr: "Ağır sanayi ciddiyetini hassas işçilikle birleştiriyoruz. Su yalıtımı ve endüstriyel zemin sistemlerinde anahtar teslim, garantili çözümler.", en: "We combine industrial precision with meticulous craftsmanship. Turnkey, guaranteed solutions in waterproofing and industrial flooring systems." },
+  "hero.line1":        { tr: "Yapıların geleceğini koruyor,", en: "We protect the future of buildings," },
+  "hero.line2":        { tr: "estetik ile",      en: "combining it" },
+  "hero.line3":        { tr: "birleştiriyoruz.", en: "with aesthetics." },
+  "hero.sub":          { tr: "Su Yalıtımı, endüstriyel zemin kaplamaları ve dekoratif sistemlerde anahtar teslim, garantili çözümler.", en: "Turnkey, guaranteed solutions in waterproofing, industrial floor coatings, and decorative systems." },
   "hero.cta1":         { tr: "Ücretsiz Keşif Talebi", en: "Free Site Survey" },
   "hero.cta2":         { tr: "Çözümlerimizi Keşfedin", en: "Explore Solutions" },
   "hero.stat1":        { tr: "Yıllık Tecrübe",   en: "Years Experience" },

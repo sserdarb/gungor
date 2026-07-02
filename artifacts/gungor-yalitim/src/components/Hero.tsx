@@ -72,8 +72,8 @@ export function Hero() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.12 }}
-          className="font-kalnia font-semibold leading-[1.02] text-white mb-10"
-          style={{ fontSize: "clamp(3.6rem, 9.5vw, 9rem)", maxWidth: "960px" }}
+          className="font-kalnia font-semibold leading-[1.15] text-white mb-10"
+          style={{ fontSize: "clamp(2.6rem, 6.2vw, 6.2rem)", maxWidth: "1080px" }}
         >
           {t("hero.line1")}{" "}
           <span style={{ color: "var(--gold-light)" }}>{t("hero.line2")}</span>
