@@ -17,6 +17,9 @@ export function Hero() {
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
+    if (v.readyState >= 2) {
+      setVidLoaded(true);
+    }
     v.play().catch(() => {});
   }, []);
 
@@ -36,6 +39,8 @@ export function Hero() {
           loop
           playsInline
           onLoadedData={() => setVidLoaded(true)}
+          onCanPlay={() => setVidLoaded(true)}
+          onLoadedMetadata={() => setVidLoaded(true)}
           className="w-full h-full object-cover transition-opacity duration-1000"
           style={{ opacity: vidLoaded ? 1 : 0, filter: "brightness(0.35) saturate(0.65)" }}
         />
