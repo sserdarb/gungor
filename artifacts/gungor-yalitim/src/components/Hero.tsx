@@ -72,12 +72,22 @@ export function Hero() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.12 }}
-          className="font-kalnia font-semibold leading-[1.2] text-white mb-10"
-          style={{ fontSize: "clamp(2.2rem, 5.8vw, 5.4rem)", maxWidth: "1100px" }}
+          className="font-kalnia font-semibold leading-[1.25] text-white mb-10"
+          style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", maxWidth: "1150px" }}
         >
-          {t("hero.line1")}
-          <br className="hidden md:inline" />{" "}
-          <span style={{ color: "var(--gold-light)" }}>{t("hero.line2")}</span>
+          {lang === "tr" ? (
+            <>
+              Yapıların Geleceğini Koruyor
+              <br className="hidden md:inline" />{" "}
+              <span style={{ color: "var(--gold-light)" }}>Estetik ile Birleştiriyoruz</span>
+            </>
+          ) : (
+            <>
+              We Protect the Future of Buildings,
+              <br className="hidden md:inline" />{" "}
+              <span style={{ color: "var(--gold-light)" }}>Combining with Aesthetics</span>
+            </>
+          )}
         </motion.h1>
 
         <motion.p
