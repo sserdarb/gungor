@@ -12,7 +12,7 @@ const stats = [
 export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [vidLoaded, setVidLoaded] = useState(false);
-  const { t } = useLang();
+  const { t, lang } = useLang();
 
   useEffect(() => {
     const v = videoRef.current;
