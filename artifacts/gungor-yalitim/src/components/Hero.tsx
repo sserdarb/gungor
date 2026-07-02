@@ -72,13 +72,12 @@ export function Hero() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.12 }}
-          className="font-kalnia font-semibold leading-[1.15] text-white mb-10"
-          style={{ fontSize: "clamp(2.6rem, 6.2vw, 6.2rem)", maxWidth: "1080px" }}
+          className="font-kalnia font-semibold leading-[1.2] text-white mb-10"
+          style={{ fontSize: "clamp(2.2rem, 5.8vw, 5.4rem)", maxWidth: "1100px" }}
         >
-          {t("hero.line1")}{" "}
+          {t("hero.line1")}
+          <br className="hidden md:inline" />{" "}
           <span style={{ color: "var(--gold-light)" }}>{t("hero.line2")}</span>
-          <br />
-          {t("hero.line3")}
         </motion.h1>
 
         <motion.p
