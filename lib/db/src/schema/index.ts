@@ -67,6 +67,7 @@ export const settingsTable = sqliteTable("settings", {
   socialFacebook: text("social_facebook"),
   socialInstagram: text("social_instagram"),
   socialLinkedin: text("social_linkedin"),
+  heroVideoUrl: text("hero_video_url"),
 });
 
 export const menuItemsTable = sqliteTable("menu_items", {
@@ -175,6 +176,7 @@ export const insertSettingsSchema = z.object({
   socialFacebook: z.string().nullable().optional(),
   socialInstagram: z.string().nullable().optional(),
   socialLinkedin: z.string().nullable().optional(),
+  heroVideoUrl: z.string().nullable().optional(),
 });
 
 export const insertMenuItemSchema = z.object({

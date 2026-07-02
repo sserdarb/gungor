@@ -4,6 +4,38 @@ import { useLang } from "@/lib/i18n";
 
 const partners = [
   {
+    name: "SİKA",
+    tagline: { tr: "Yapı Kimyasalları & Yalıtım", en: "Building Chemicals & Waterproofing" },
+    description: { tr: "Su yalıtımı, beton teknolojileri ve endüstriyel zemin sistemlerinde dünya çapında standartları belirleyen İsviçre menşeili global lider marka.", en: "A Swiss-based global leader that sets worldwide standards in waterproofing, concrete technologies, and industrial flooring systems." },
+    logoUrl: "https://logo.clearbit.com/sika.com",
+    href: "https://tur.sika.com/",
+    name_display: "SİKA",
+  },
+  {
+    name: "DEMMERG",
+    tagline: { tr: "Epoksi & Endüstriyel Zeminler", en: "Epoxy & Industrial Floors" },
+    description: { tr: "1952'den beri yüksek bilimsel Ar-Ge altyapısıyla epoksi zemin kaplamaları, endüstriyel zemin sistemleri ve özel yapıştırıcılar üreten çözüm ortağımız.", en: "Our solution partner producing epoxy floor coatings, industrial flooring systems, and specialized adhesives since 1952 with advanced scientific R&D infrastructure." },
+    logoUrl: "https://logo.clearbit.com/demmerg.com",
+    href: "https://demmerg.com/",
+    name_display: "DEMMERG",
+  },
+  {
+    name: "KÖSTER",
+    tagline: { tr: "Alman Mühendislik & Yalıtım", en: "German Engineering & Waterproofing" },
+    description: { tr: "Köster, su yalıtımı ve yapı koruma sistemlerinde 30 yılı aşkın Alman mühendislik kalitesini Türkiye'ye taşıyan uluslararası marka.", en: "Köster is an international brand bringing over 30 years of German engineering quality in waterproofing and building protection systems to Turkey." },
+    logoUrl: "https://logo.clearbit.com/koster.com.tr",
+    href: "https://koster.com.tr/",
+    name_display: "KÖSTER",
+  },
+  {
+    name: "BAUMIT",
+    tagline: { tr: "Cephe & Sıva Sistemleri", en: "Facade & Plaster Systems" },
+    description: { tr: "Avrupa'nın önde gelen yapı malzemeleri markası Baumit; sıva, cephe, ısı yalıtımı ve zemin sistemlerinde eksiksiz çözümler sunar.", en: "Baumit, Europe's leading building materials brand, offers complete solutions in plaster, facade, thermal insulation, and flooring systems." },
+    logoUrl: "https://logo.clearbit.com/baumit.com.tr",
+    href: "https://baumit.com.tr/",
+    name_display: "BAUMIT",
+  },
+  {
     name: "TACER",
     tagline: { tr: "Asma Tavan & Mimari Sistemler", en: "Suspended Ceiling & Architectural Systems" },
     description: { tr: "Metal, ahşap asma tavan sistemleri, profil çözümleri ve mimari cephe kaplamaları alanında 30 yıla yakın üretim uzmanlığına sahip sektör öncüsü.", en: "An industry pioneer with nearly 30 years of production expertise in metal, wood suspended ceilings, profiles, and architectural facade systems." },
@@ -26,38 +58,6 @@ const partners = [
     logoUrl: "https://logo.clearbit.com/lunik.cc",
     href: "https://www.lunik.cc/tr/inicio-turkce/",
     name_display: "LUNIK",
-  },
-  {
-    name: "DEMMERG",
-    tagline: { tr: "Epoksi & Endüstriyel Zeminler", en: "Epoxy & Industrial Floors" },
-    description: { tr: "1952'den beri yüksek bilimsel Ar-Ge altyapısıyla epoksi zemin kaplamaları, endüstriyel zemin sistemleri ve özel yapıştırıcılar üreten çözüm ortağımız.", en: "Our solution partner producing epoxy floor coatings, industrial flooring systems, and specialized adhesives since 1952 with advanced scientific R&D infrastructure." },
-    logoUrl: "https://logo.clearbit.com/demmerg.com",
-    href: "https://demmerg.com/",
-    name_display: "DEMMERG",
-  },
-  {
-    name: "SİKA",
-    tagline: { tr: "Yapı Kimyasalları & Yalıtım", en: "Building Chemicals & Insulation" },
-    description: { tr: "Su yalıtımı, beton teknolojileri ve endüstriyel zemin sistemlerinde dünya çapında standartları belirleyen İsviçre menşeili global lider marka.", en: "A Swiss-based global leader that sets worldwide standards in waterproofing, concrete technologies, and industrial flooring systems." },
-    logoUrl: "https://logo.clearbit.com/sika.com",
-    href: "https://tur.sika.com/",
-    name_display: "SİKA",
-  },
-  {
-    name: "KÖSTER",
-    tagline: { tr: "Alman Mühendislik & Yalıtım", en: "German Engineering & Waterproofing" },
-    description: { tr: "Köster, su yalıtımı ve yapı koruma sistemlerinde 30 yılı aşkın Alman mühendislik kalitesini Türkiye'ye taşıyan uluslararası marka.", en: "Köster is an international brand bringing over 30 years of German engineering quality in waterproofing and building protection systems to Turkey." },
-    logoUrl: "https://logo.clearbit.com/koster.com.tr",
-    href: "https://koster.com.tr/",
-    name_display: "KÖSTER",
-  },
-  {
-    name: "BAUMIT",
-    tagline: { tr: "Cephe & Sıva Sistemleri", en: "Facade & Plaster Systems" },
-    description: { tr: "Avrupa'nın önde gelen yapı malzemeleri markası Baumit; sıva, cephe, ısı yalıtımı ve zemin sistemlerinde eksiksiz çözümler sunar.", en: "Baumit, Europe's leading building materials brand, offers complete solutions in plaster, facade, thermal insulation, and flooring systems." },
-    logoUrl: "https://logo.clearbit.com/baumit.com.tr",
-    href: "https://baumit.com.tr/",
-    name_display: "BAUMIT",
   },
 ];
 

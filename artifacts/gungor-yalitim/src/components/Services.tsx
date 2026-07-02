@@ -46,8 +46,8 @@ const waterGroups: ServiceGroup[] = [
 const industrialGroups: ServiceGroup[] = [
   {
     id: "endustriyel-zemin",
-    titleTr: "Sert Zemin Sistemleri",
-    titleEn: "Hard Floor Systems",
+    titleTr: "Endüstriyel Zemin Sistemleri",
+    titleEn: "Industrial Floor Systems",
     image: px(2041627),
     slugs: ["epoksi-zemin", "poliuretan-zemin", "cimento-esasli-zemin", "beton-silim-parlatma"],
   },

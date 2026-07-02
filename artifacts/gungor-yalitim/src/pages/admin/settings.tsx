@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Settings, ShieldAlert, Globe, MessageSquare, Megaphone } from "lucide-react";
+import { Save, Settings, ShieldAlert, Globe, MessageSquare, Megaphone, Video } from "lucide-react";
 
 export default function AdminSettings() {
   const queryClient = useQueryClient();
@@ -32,6 +32,7 @@ export default function AdminSettings() {
   const [socialFacebook, setSocialFacebook] = useState("");
   const [socialInstagram, setSocialInstagram] = useState("");
   const [socialLinkedin, setSocialLinkedin] = useState("");
+  const [heroVideoUrl, setHeroVideoUrl] = useState("");
 
   // Fetch Settings
   const { data: settings, isLoading } = useQuery<any>({
@@ -60,6 +61,7 @@ export default function AdminSettings() {
       setSocialFacebook(settings.socialFacebook || "");
       setSocialInstagram(settings.socialInstagram || "");
       setSocialLinkedin(settings.socialLinkedin || "");
+      setHeroVideoUrl(settings.heroVideoUrl || "");
     }
   }, [settings]);
 
@@ -104,6 +106,7 @@ export default function AdminSettings() {
       socialFacebook: socialFacebook || null,
       socialInstagram: socialInstagram || null,
       socialLinkedin: socialLinkedin || null,
+      heroVideoUrl: heroVideoUrl || null,
     });
   };
 
@@ -186,6 +189,43 @@ export default function AdminSettings() {
                   <Label htmlFor="linkedin">LinkedIn Sayfa Linki</Label>
                   <Input id="linkedin" type="url" value={socialLinkedin} onChange={e => setSocialLinkedin(e.target.value)} placeholder="https://linkedin.com/company/..." />
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Section: Ana Sayfa Yönetimi - Hero Video */}
+            <Card className="border-[#A58E6A]/20 shadow-md lg:col-span-2 border-l-4 border-l-[#A58E6A]">
+              <CardHeader className="border-b pb-4 flex flex-row items-center gap-2">
+                <Video className="w-5 h-5 text-[#A58E6A]" />
+                <div>
+                  <CardTitle className="font-serif text-lg text-[#0D3143]">Ana Sayfa Yönetimi — Hero Video</CardTitle>
+                  <CardDescription>Ana sayfanın arka plan videosunu yönetin. MP4 URL'si veya /videos/dosya.mp4 şeklinde sunucu yolu girin.</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="heroVideoUrl">Hero Video URL veya Dosya Yolu</Label>
+                  <Input
+                    id="heroVideoUrl"
+                    value={heroVideoUrl}
+                    onChange={e => setHeroVideoUrl(e.target.value)}
+                    placeholder="/videos/waterproofing_flooring_services.mp4 veya https://..."
+                  />
+                  <p className="text-xs text-gray-500">Örnek: <code className="bg-gray-100 px-1 rounded">/videos/waterproofing_flooring_services.mp4</code> — Boş bırakırsanız varsayılan video kullanılır.</p>
+                </div>
+                {heroVideoUrl && (
+                  <div className="mt-4 rounded overflow-hidden border border-[#A58E6A]/20">
+                    <video
+                      src={heroVideoUrl}
+                      className="w-full max-h-48 object-cover"
+                      muted
+                      loop
+                      autoPlay
+                      playsInline
+                      controls
+                    />
+                    <p className="text-xs text-center text-gray-400 py-1 bg-gray-50">Önizleme</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

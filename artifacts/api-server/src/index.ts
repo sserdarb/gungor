@@ -152,9 +152,10 @@ async function seedDatabase() {
         contactPhone: "+90 232 123 45 67",
         contactAddressTr: "İzmir, Türkiye",
         contactAddressEn: "Izmir, Turkey",
-        socialFacebook: "https://facebook.com/gungoryalitim",
-        socialInstagram: "https://instagram.com/gungoryalitim",
-        socialLinkedin: "https://linkedin.com/company/gungoryalitim"
+        socialFacebook: "https://www.facebook.com/gungor.muhendislik",
+        socialInstagram: "https://www.instagram.com/gungor.muhendislik",
+        socialLinkedin: "https://www.linkedin.com/company/g%C3%BCng%C3%B6r-m%C3%BChendislik",
+        heroVideoUrl: "/videos/waterproofing_flooring_services.mp4"
       });
       console.log("Default settings created successfully.");
     }
@@ -433,7 +434,7 @@ app.put("/api/settings", requireAuth, async (req, res) => {
       titleTr, titleEn, descriptionTr, descriptionEn, keywordsTr, keywordsEn,
       googleAnalyticsId, googleSearchConsoleId, googleTagManagerId, facebookPixelId,
       whatsappNumber, contactEmail, contactPhone, contactAddressTr, contactAddressEn,
-      socialFacebook, socialInstagram, socialLinkedin
+      socialFacebook, socialInstagram, socialLinkedin, heroVideoUrl
     } = req.body;
 
     const existing = await db.select().from(settingsTable).limit(1).get();
@@ -443,7 +444,7 @@ app.put("/api/settings", requireAuth, async (req, res) => {
           titleTr, titleEn, descriptionTr, descriptionEn, keywordsTr, keywordsEn,
           googleAnalyticsId, googleSearchConsoleId, googleTagManagerId, facebookPixelId,
           whatsappNumber, contactEmail, contactPhone, contactAddressTr, contactAddressEn,
-          socialFacebook, socialInstagram, socialLinkedin
+          socialFacebook, socialInstagram, socialLinkedin, heroVideoUrl
         })
         .where(eq(settingsTable.id, existing.id));
     } else {
@@ -451,7 +452,7 @@ app.put("/api/settings", requireAuth, async (req, res) => {
         titleTr, titleEn, descriptionTr, descriptionEn, keywordsTr, keywordsEn,
         googleAnalyticsId, googleSearchConsoleId, googleTagManagerId, facebookPixelId,
         whatsappNumber, contactEmail, contactPhone, contactAddressTr, contactAddressEn,
-        socialFacebook, socialInstagram, socialLinkedin
+        socialFacebook, socialInstagram, socialLinkedin, heroVideoUrl
       });
     }
 

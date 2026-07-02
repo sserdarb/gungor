@@ -13,6 +13,16 @@ export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [vidLoaded, setVidLoaded] = useState(false);
   const { t, lang } = useLang();
+  const [videoUrl, setVideoUrl] = useState("/videos/waterproofing_flooring_services.mp4");
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data?.heroVideoUrl) setVideoUrl(data.heroVideoUrl);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -21,7 +31,7 @@ export function Hero() {
       setVidLoaded(true);
     }
     v.play().catch(() => {});
-  }, []);
+  }, [videoUrl]);
 
   return (
     <section
@@ -33,7 +43,7 @@ export function Hero() {
       <div className="absolute inset-0 overflow-hidden">
         <video
           ref={videoRef}
-          src="/videos/waterproofing_flooring_services.mp4"
+          src={videoUrl}
           autoPlay
           muted
           loop

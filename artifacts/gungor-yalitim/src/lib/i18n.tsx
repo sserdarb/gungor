@@ -22,7 +22,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "hero.line1":        { tr: "Yapıların Geleceğini Koruyor,", en: "We Protect the Future of Buildings," },
   "hero.line2":        { tr: "Estetik ile Birleştiriyoruz",  en: "Combining with Aesthetics" },
   "hero.line3":        { tr: "", en: "" },
-  "hero.sub":          { tr: "Su Yalıtımı, endüstriyel zemin kaplamaları ve dekoratif sistemlerde anahtar teslim, garantili çözümler.", en: "Turnkey, guaranteed solutions in waterproofing, industrial floor coatings, and decorative systems." },
+  "hero.sub":          { tr: "Su yalıtımı, endüstriyel zemin sistemleri ve dekoratif sistemlerde anahtar teslim garantili çözümler.", en: "Turnkey, guaranteed solutions in waterproofing, industrial flooring systems, and decorative systems." },
   "hero.cta1":         { tr: "Ücretsiz Keşif Talebi", en: "Free Site Survey" },
   "hero.cta2":         { tr: "Çözümlerimizi Keşfedin", en: "Explore Solutions" },
   "hero.stat1":        { tr: "Yıllık Tecrübe",   en: "Years Experience" },
